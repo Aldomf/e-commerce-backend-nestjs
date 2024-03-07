@@ -9,5 +9,6 @@ import { UserModule } from 'src/user-module/user.module';
   imports: [TypeOrmModule.forFeature([Order]), UserModule],
   controllers: [OrderController],
   providers: [OrderService],
+  exports: [OrderService, TypeOrmModule.forFeature([Order])],
 })
-export class OrderModuleModule {}
+export class OrderModule {}

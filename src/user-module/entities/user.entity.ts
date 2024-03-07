@@ -8,6 +8,7 @@ import {
   JoinTable,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
 } from 'typeorm';
 import { Role } from 'src/common/enums/role.enum';
 import { Product } from 'src/product-module/entities/product.entity';
@@ -51,7 +52,7 @@ export class User {
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];
 
-  // One-to-Many relationship with user's shipping addresses
-  @OneToMany(() => ShippingAddress, (shippingAddress) => shippingAddress.user)
-  shippingAddresses: ShippingAddress[];
+  // One-to-One relationship with user's shipping address
+  @OneToOne(() => ShippingAddress, (shippingAddress) => shippingAddress.user)
+  shippingAddress: ShippingAddress;
 }

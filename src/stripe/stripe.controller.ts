@@ -1,12 +1,12 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Get, Param } from '@nestjs/common';
 import { StripeService } from './stripe.service';
 
 @Controller('checkout')
 export class StripeController {
   constructor(private readonly stripeService: StripeService) {}
 
-  @Post('/session')
-  async createCheckoutSession(@Body('userId') userId: number) {
+  @Post('/session/:userId')
+  async createCheckoutSession(@Param('userId') userId: number) {
     try {
       const session = await this.stripeService.createCheckoutSession(userId);
       return { session }; // Return the session object created by Stripe

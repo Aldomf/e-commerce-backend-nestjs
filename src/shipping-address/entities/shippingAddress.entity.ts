@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { User } from 'src/user-module/entities/user.entity';
 
 @Entity()
@@ -13,6 +19,9 @@ export class ShippingAddress {
   city: string;
 
   @Column()
+  country: string;
+
+  @Column()
   state: string;
 
   @Column()
@@ -21,6 +30,8 @@ export class ShippingAddress {
   @Column()
   mobile: string;
 
-  @ManyToOne(() => User, (user) => user.shippingAddresses)
+  // One-to-One relationship with user
+  @OneToOne(() => User)
+  @JoinColumn()
   user: User;
 }

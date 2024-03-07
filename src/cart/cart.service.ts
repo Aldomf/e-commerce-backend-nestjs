@@ -257,4 +257,8 @@ export class CartService {
 
     return items;
   }
+
+  async getCartItems(userId: number): Promise<CartListItem[]> {
+    return await this.cartListItemRepository.find({ where: { userId } });
+  }
 }

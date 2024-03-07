@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth-module/auth.module';
 import { ProductModule } from './product-module/product.module';
-import { OrderModuleModule } from './order-module/order.module';
+import { OrderModule } from './order-module/order.module';
 import { UserModule } from './user-module/user.module';
 import { AdminModuleModule } from './admin-module/admin-module.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -26,7 +26,7 @@ import { ShippingAddressModule } from './shipping-address/shipping-address.modul
     }),
     AuthModule,
     ProductModule,
-    OrderModuleModule,
+    OrderModule,
     UserModule,
     AdminModuleModule,
     CategoryModule,
