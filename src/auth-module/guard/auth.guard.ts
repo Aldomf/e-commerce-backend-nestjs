@@ -17,7 +17,7 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException('Token does not exist');
+      throw new UnauthorizedException('User must be authenticated');
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
@@ -26,7 +26,7 @@ export class AuthGuard implements CanActivate {
 
       request['user'] = payload;
     } catch {
-      throw new UnauthorizedException('The token is not valid');
+      throw new UnauthorizedException('User must be authenticated');
     }
 
     return true;

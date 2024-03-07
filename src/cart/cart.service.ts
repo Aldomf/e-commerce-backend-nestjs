@@ -90,7 +90,7 @@ export class CartService {
   //   }
   // }
 
-  //!onDelete CASCADE
+  //onDelete CASCADE
   async deleteProductFromCart(
     productId: number,
     userId: number,
@@ -188,21 +188,6 @@ export class CartService {
     // Save the updated cart item
     await this.cartListItemRepository.save(cartItem);
   }
-
-  //!!!!!!!!
-  // async clearCart(userId: number): Promise<void> {
-  //   // Find the user
-  //   const user = await this.userRepository.findOne({
-  //     where: { id: userId },
-  //     relations: ['cartList'],
-  //   });
-  //   if (!user) {
-  //     throw new NotFoundException('User not found');
-  //   }
-
-  //   // Delete all items from the user's cart
-  //   await this.cartListItemRepository.delete({ user: { id: userId } });
-  // }
 
   async clearCart(userId: number): Promise<void> {
     // Find the user

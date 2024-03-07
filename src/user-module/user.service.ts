@@ -108,4 +108,24 @@ export class UserService {
 
     return user; // Optionally, you can return the updated user
   }
+
+  async findOneWishlist(userId: number) {
+    // Validate userId as a number
+    if (isNaN(userId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+    // Find the user by userId and eagerly load the wishlist
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['wishlist'],
+    });
+
+    // Throw NotFoundException if user is not found
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Return the wishlist of the user
+    return user.wishlist;
+  }
 }
