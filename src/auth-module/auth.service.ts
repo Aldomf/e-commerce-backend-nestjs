@@ -57,7 +57,11 @@ export class AuthService {
 
   // Function to generate JWT token
   private async generateToken(user: User): Promise<string> {
-    const payload = { email: user.email, sub: user.id }; // Customize payload as per your needs
+    const payload = {
+      email: user.email,
+      username: user.username,
+      sub: user.id,
+    }; // Customize payload as per your needs
     return await this.jwtService.signAsync(payload); // Sign the payload to generate JWT token
   }
 }

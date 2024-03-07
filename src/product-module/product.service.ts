@@ -107,10 +107,37 @@ export class ProductService {
       }
     }
 
+    // Validate price
+    if (
+      !Number.isFinite(updateProductDto.price) ||
+      updateProductDto.price <= 0
+    ) {
+      throw new BadRequestException('Price must be a valid positive number');
+    }
+
+    // Validate discountPercentage
+    if (
+      updateProductDto.discountPercentage &&
+      (updateProductDto.discountPercentage <= 0 ||
+        updateProductDto.discountPercentage >= 100)
+    ) {
+      throw new BadRequestException(
+        'Discount percentage must be a valid number between 0 and 100',
+      );
+    }
+
+    // Calculate priceWithDiscount if both price and discountPercentage are provided
+    const { price, discountPercentage } = updateProductDto;
+    let priceWithDiscount = price;
+    if (discountPercentage) {
+      priceWithDiscount -= (price * discountPercentage) / 100;
+    }
+
     // Create a partial entity object with the updated fields
     const partialEntity: Partial<Product> = {
       ...updateProductDto,
       category: category ?? productExist.category, // Use the existing category if not provided in the DTO
+      priceWithDiscount: priceWithDiscount, // Update priceWithDiscount field
     };
 
     await this.productRepository.update(id, partialEntity);
