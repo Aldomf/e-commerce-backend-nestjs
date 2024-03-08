@@ -4,7 +4,7 @@ import { OrderController } from './order.controller';
 import { Order } from './entities/order.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from 'src/user-module/user.module';
-import { AuthModule } from 'src/auth-module/entities/auth-module.entity';
+import { AuthModule } from 'src/auth-module/auth.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Order]), UserModule, AuthModule],

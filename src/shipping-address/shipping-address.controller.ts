@@ -1,10 +1,22 @@
-import { Controller, Post, Body, Param, Patch, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Get,
+  UseGuards,
+} from '@nestjs/common';
 import { ShippingAddressService } from './shipping-address.service';
 import { CreateShippingAddressDto } from './dto/createShippingAddress.dto';
 import { UpdateShippingAddressDto } from './dto/updateShippingAddress.dto';
 import { ShippingAddress } from './entities/shippingAddress.entity';
+import { AuthGuard } from 'src/auth-module/guard/auth.guard';
+import { UserIdGuard } from 'src/common/guards/userId.guard';
 
 @Controller('shipping-address')
+@UseGuards(UserIdGuard)
+@UseGuards(AuthGuard)
 export class ShippingAddressController {
   constructor(
     private readonly shippingAddressService: ShippingAddressService,

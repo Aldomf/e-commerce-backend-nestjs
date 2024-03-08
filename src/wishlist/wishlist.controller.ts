@@ -10,8 +10,10 @@ import {
 } from '@nestjs/common';
 import { WishlistService } from './wishlist.service';
 import { AuthGuard } from 'src/auth-module/guard/auth.guard';
+import { UserIdGuard } from 'src/common/guards/userId.guard';
 
 @Controller('wishlist')
+@UseGuards(UserIdGuard)
 @UseGuards(AuthGuard)
 export class WishlistController {
   constructor(private readonly wishlistService: WishlistService) {}

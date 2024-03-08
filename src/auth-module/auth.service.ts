@@ -61,6 +61,7 @@ export class AuthService {
       email: user.email,
       username: user.username,
       sub: user.id,
+      role: user.role,
     }; // Customize payload as per your needs
     return await this.jwtService.signAsync(payload); // Sign the payload to generate JWT token
   }

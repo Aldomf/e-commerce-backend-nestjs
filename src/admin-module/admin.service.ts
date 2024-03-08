@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAdminModuleDto } from './dto/create-admin-module.dto';
-import { UpdateAdminModuleDto } from './dto/update-admin-module.dto';
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { UpdateAdminDto } from './dto/update-admin.dto';
 
 @Injectable()
-export class AdminModuleService {
-  create(createAdminModuleDto: CreateAdminModuleDto) {
+export class AdminService {
+  create(createAdminDto: CreateAdminDto) {
     return 'This action adds a new adminModule';
   }
 
@@ -16,7 +16,7 @@ export class AdminModuleService {
     return `This action returns a #${id} adminModule`;
   }
 
-  update(id: number, updateAdminModuleDto: UpdateAdminModuleDto) {
+  update(id: number, updateAdminDto: UpdateAdminDto) {
     return `This action updates a #${id} adminModule`;
   }
 

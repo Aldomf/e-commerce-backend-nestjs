@@ -1,11 +1,13 @@
 import { Controller, Post, Get, Param, UseGuards } from '@nestjs/common';
 import { StripeService } from './stripe.service';
 import { AuthGuard } from 'src/auth-module/guard/auth.guard';
+import { UserIdGuard } from 'src/common/guards/userId.guard';
 
 @Controller('checkout')
 export class StripeController {
   constructor(private readonly stripeService: StripeService) {}
 
+  @UseGuards(UserIdGuard)
   @UseGuards(AuthGuard)
   @Post('/session/:userId')
   async createCheckoutSession(@Param('userId') userId: number) {

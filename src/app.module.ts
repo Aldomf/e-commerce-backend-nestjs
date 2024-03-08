@@ -3,7 +3,7 @@ import { AuthModule } from './auth-module/auth.module';
 import { ProductModule } from './product-module/product.module';
 import { OrderModule } from './order-module/order.module';
 import { UserModule } from './user-module/user.module';
-import { AdminModuleModule } from './admin-module/admin-module.module';
+import { AdminModule } from './admin-module/admin.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CategoryModule } from './category/category.module';
 import { CartModule } from './cart/cart.module';
@@ -30,7 +30,7 @@ import { ReviewModule } from './review/review.module';
     ProductModule,
     OrderModule,
     UserModule,
-    AdminModuleModule,
+    AdminModule,
     CategoryModule,
     CartModule,
     PaymentModule,
