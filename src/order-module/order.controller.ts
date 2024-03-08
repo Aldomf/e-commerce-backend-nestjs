@@ -6,14 +6,19 @@ import {
   Patch,
   Param,
   Delete,
+  NotFoundException,
+  BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Status } from 'src/common/enums/status.enum';
 import { Order } from './entities/order.entity';
+import { AuthGuard } from 'src/auth-module/guard/auth.guard';
 
 @Controller('orders')
+@UseGuards(AuthGuard)
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
@@ -48,5 +53,23 @@ export class OrderController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.orderService.remove(+id);
+  }
+
+  @Get('user/:userId')
+  async findOrdersByUserId(@Param('userId') userId: string) {
+    try {
+      const orders = await this.orderService.findOrdersByUserId(
+        parseInt(userId, 10),
+      );
+      return { orders };
+    } catch (error) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
+        return { error: error.message };
+      }
+      throw error; // Let other errors propagate
+    }
   }
 }

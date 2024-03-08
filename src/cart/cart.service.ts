@@ -246,4 +246,30 @@ export class CartService {
   async getCartItems(userId: number): Promise<CartListItem[]> {
     return await this.cartListItemRepository.find({ where: { userId } });
   }
+
+  async findCartByUserId(userId: number): Promise<Product[]> {
+    // Validate userId as a number
+    if (isNaN(userId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+
+    // Find user by userId and eagerly load the cartList
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['cartList'],
+    });
+
+    // Throw NotFoundException if user is not found
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if the cartList is empty
+    if (!user.cartList || user.cartList.length === 0) {
+      throw new NotFoundException('Cart is empty');
+    }
+
+    // Return the cartList of the user
+    return user.cartList;
+  }
 }

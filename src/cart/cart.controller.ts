@@ -1,4 +1,13 @@
-import { Controller, Post, Param, Delete, Get, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Param,
+  Delete,
+  Get,
+  Patch,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CartService } from './cart.service';
 
 @Controller('cart')
@@ -49,5 +58,23 @@ export class CartController {
   @Get(':userId/items')
   async getUserCartItems(@Param('userId') userId: number) {
     return this.cartService.constructItemsArray(userId);
+  }
+
+  @Get('user/:userId')
+  async findCartByUserId(@Param('userId') userId: string) {
+    try {
+      const cartList = await this.cartService.findCartByUserId(
+        parseInt(userId, 10),
+      );
+      return { cartList };
+    } catch (error) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
+        return { error: error.message };
+      }
+      throw error; // Let other errors propagate
+    }
   }
 }

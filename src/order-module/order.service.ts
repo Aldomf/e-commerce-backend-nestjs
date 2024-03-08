@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -46,5 +50,24 @@ export class OrderService {
     }
     order.orderStatus = status;
     return this.orderRepository.save(order);
+  }
+
+  async findOrdersByUserId(userId: number): Promise<Order[]> {
+    // Validate userId as a number
+    if (isNaN(userId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+
+    // Check if user exists
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Find orders by user ID
+    return this.orderRepository.find({
+      where: { userId },
+      relations: ['products'],
+    });
   }
 }

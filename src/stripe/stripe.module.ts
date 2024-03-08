@@ -8,6 +8,7 @@ import { OrderModule } from 'src/order-module/order.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Order } from 'src/order-module/entities/order.entity';
 import { ProductModule } from 'src/product-module/product.module';
+import { AuthModule } from 'src/auth-module/auth.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ProductModule } from 'src/product-module/product.module';
     UserModule,
     OrderModule,
     ProductModule,
+    AuthModule,
     forwardRef(() => PaymentModule),
   ],
   controllers: [StripeController],

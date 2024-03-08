@@ -11,6 +11,7 @@ import { PaymentModule } from './payment/payment.module';
 import { StripeModule } from './stripe/stripe.module';
 import { WebhookModule } from './webhook/webhook.module';
 import { ShippingAddressModule } from './shipping-address/shipping-address.module';
+import { WishlistModule } from './wishlist/wishlist.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ShippingAddressModule } from './shipping-address/shipping-address.modul
     StripeModule,
     WebhookModule,
     ShippingAddressModule,
+    WishlistModule,
   ],
   controllers: [],
   providers: [],
