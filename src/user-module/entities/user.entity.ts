@@ -1,4 +1,3 @@
-// User entity
 import {
   Entity,
   Column,
@@ -14,6 +13,7 @@ import { Role } from 'src/common/enums/role.enum';
 import { Product } from 'src/product-module/entities/product.entity';
 import { Order } from 'src/order-module/entities/order.entity';
 import { ShippingAddress } from 'src/shipping-address/entities/shippingAddress.entity';
+import { Review } from 'src/review/entities/review.entity';
 
 @Entity('users')
 export class User {
@@ -55,4 +55,8 @@ export class User {
   // One-to-One relationship with user's shipping address
   @OneToOne(() => ShippingAddress, (shippingAddress) => shippingAddress.user)
   shippingAddress: ShippingAddress;
+
+  // One-to-Many relationship with user's reviews
+  @OneToMany(() => Review, (review) => review.user)
+  reviews: Review[];
 }

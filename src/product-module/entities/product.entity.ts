@@ -6,11 +6,13 @@ import {
   UpdateDateColumn,
   ManyToMany,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { Order } from 'src/order-module/entities/order.entity';
 import { User } from 'src/user-module/entities/user.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { IsNumber } from 'class-validator';
+import { Review } from 'src/review/entities/review.entity';
 
 @Entity('products')
 export class Product {
@@ -70,4 +72,8 @@ export class Product {
 
   @ManyToMany(() => Order, (order) => order.products)
   orders: Order[];
+
+  // One-to-Many relationship with product's reviews
+  @OneToMany(() => Review, (review) => review.product)
+  reviews: Review[];
 }

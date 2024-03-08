@@ -12,6 +12,7 @@ import { StripeModule } from './stripe/stripe.module';
 import { WebhookModule } from './webhook/webhook.module';
 import { ShippingAddressModule } from './shipping-address/shipping-address.module';
 import { WishlistModule } from './wishlist/wishlist.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { WishlistModule } from './wishlist/wishlist.module';
     WebhookModule,
     ShippingAddressModule,
     WishlistModule,
+    ReviewModule,
   ],
   controllers: [],
   providers: [],
