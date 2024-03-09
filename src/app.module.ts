@@ -13,16 +13,20 @@ import { WebhookModule } from './webhook/webhook.module';
 import { ShippingAddressModule } from './shipping-address/shipping-address.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 import { ReviewModule } from './review/review.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'Aldosql',
-      database: 'e-commerce',
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT, 10) || 3306,
+      username: process.env.DB_USERNAME || 'root',
+      password: process.env.DB_PASSWORD || 'Aldosql',
+      database: process.env.DB_DATABASE || 'e-commerce',
       autoLoadEntities: true,
       synchronize: true,
     }),
