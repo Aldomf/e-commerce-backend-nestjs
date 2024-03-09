@@ -7,18 +7,23 @@ import {
   Patch,
   NotFoundException,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
+import { CartGuard } from 'src/common/guards/cart.guard';
+import { AdminGuard } from 'src/common/guards/admin.guard';
 
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
+  @UseGuards(AdminGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.cartService.constructItemsArray(+id);
   }
 
+  @UseGuards(CartGuard)
   @Post(':userId/add-product-to-cartList/:productId')
   async addToCart(
     @Param('productId') productId: number,
@@ -28,6 +33,7 @@ export class CartController {
     return { message: 'Product added to cart successfully' };
   }
 
+  @UseGuards(CartGuard)
   @Delete(':userId/delete-product-from-cartList/:productId')
   async removeFromCart(
     @Param('productId') productId: number,
@@ -37,6 +43,7 @@ export class CartController {
     return { message: 'Product removed from cart successfully' };
   }
 
+  @UseGuards(CartGuard)
   @Patch(':userId/:productId/increase-quantity')
   async increaseCartItemQuantity(
     @Param('userId') userId: number,
@@ -46,6 +53,7 @@ export class CartController {
     return { message: 'Cart item quantity increased successfully' };
   }
 
+  @UseGuards(CartGuard)
   @Patch(':userId/:productId/decrease-quantity')
   async decreaseCartItemQuantity(
     @Param('userId') userId: number,
@@ -60,6 +68,7 @@ export class CartController {
     return this.cartService.constructItemsArray(userId);
   }
 
+  @UseGuards(CartGuard)
   @Get('user/:userId')
   async findCartByUserId(@Param('userId') userId: string) {
     try {
