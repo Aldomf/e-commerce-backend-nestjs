@@ -7,11 +7,14 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AdminGuard } from 'src/common/guards/admin.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('product')
 export class ProductController {
@@ -19,8 +22,13 @@ export class ProductController {
 
   @Post('create')
   @UseGuards(AdminGuard)
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productService.create(createProductDto);
+  @UseInterceptors(FileInterceptor('image')) // Intercept the 'image' file from the request
+  async create(
+    @Body() createProductDto: CreateProductDto,
+    @UploadedFile() imageFile: Express.Multer.File, // Inject the uploaded image file
+  ) {
+    // Call the service method to create the product and pass both the DTO and the image file
+    return this.productService.create(createProductDto, imageFile);
   }
 
   @Get()
@@ -35,13 +43,26 @@ export class ProductController {
 
   @Patch(':id')
   @UseGuards(AdminGuard)
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productService.update(+id, updateProductDto);
+  @UseInterceptors(FileInterceptor('image'))
+  async update(
+    @Param('id') id: number,
+    @Body() updateProductDto: UpdateProductDto,
+    @UploadedFile() imageFile: Express.Multer.File,
+  ) {
+    return await this.productService.update(id, updateProductDto, imageFile);
   }
 
   @Delete(':id')
   @UseGuards(AdminGuard)
   remove(@Param('id') id: string) {
     return this.productService.remove(+id);
+  }
+
+  @Post('upload-image')
+  @UseInterceptors(FileInterceptor('imageFile'))
+  async uploadImage(@UploadedFile() imageFile: Express.Multer.File) {
+    // Handle the uploaded image file and save it to the server
+    const imageUrl = await this.productService.saveImage(imageFile);
+    return { imageUrl };
   }
 }

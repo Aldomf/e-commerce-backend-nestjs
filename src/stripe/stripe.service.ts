@@ -61,7 +61,7 @@ export class StripeService {
           product_data: {
             name: item.name,
             description: item.description,
-            images: [item.image],
+            images: [item.imageUrl],
           },
           unit_amount: parseFloat((item.price * 100).toFixed(2)),
         },
@@ -79,6 +79,8 @@ export class StripeService {
         allowed_countries: ['US', 'CA', 'MX'], // Assuming allowed countries
       },
     });
+    // Log the image URL in the console
+    console.log('Image URL:', items[0].imageUrl);
 
     return session;
   }

@@ -14,6 +14,8 @@ import { ShippingAddressModule } from './shipping-address/shipping-address.modul
 import { WishlistModule } from './wishlist/wishlist.module';
 import { ReviewModule } from './review/review.module';
 import { ConfigModule } from '@nestjs/config';
+import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -43,6 +45,10 @@ import { ConfigModule } from '@nestjs/config';
     ShippingAddressModule,
     WishlistModule,
     ReviewModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'src', 'uploads'), // Specify the root path for static content
+      serveRoot: '/', // Serve files from the root URL without appending index.html
+    }),
   ],
   controllers: [],
   providers: [],

@@ -9,17 +9,24 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { CategoryService } from 'src/category/category.service';
-import { Category } from 'src/category/entities/category.entity';
+import { join } from 'path';
+import { createWriteStream, existsSync, mkdirSync } from 'fs';
+import { Order } from 'src/order-module/entities/order.entity';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
     private readonly categoryService: CategoryService,
   ) {}
 
-  async create(createProductDto: CreateProductDto) {
+  async create(
+    createProductDto: CreateProductDto,
+    imageFile: Express.Multer.File,
+  ): Promise<Product> {
     // Check if the product with the same name already exists
     const foundProduct = await this.productRepository.findOne({
       where: { name: createProductDto.name },
@@ -38,25 +45,67 @@ export class ProductService {
       throw new BadRequestException('Category does not exist');
     }
 
+    // Logging discountPercentage, discountActive, and price before calculation
+    console.log('Discount Percentage:', createProductDto.discountPercentage);
+    const discountActive =
+      typeof createProductDto.discountActive === 'boolean'
+        ? createProductDto.discountActive
+        : createProductDto.discountActive === 'true';
+
+    const sale =
+      typeof createProductDto.sale === 'boolean'
+        ? createProductDto.sale
+        : createProductDto.sale === 'true';
+
+    const newProduct =
+      typeof createProductDto.new === 'boolean'
+        ? createProductDto.new
+        : createProductDto.new === 'true';
+
+    const inStock =
+      typeof createProductDto.inStock === 'boolean'
+        ? createProductDto.inStock
+        : createProductDto.inStock === 'true';
+
+    const hot =
+      typeof createProductDto.hot === 'boolean'
+        ? createProductDto.hot
+        : createProductDto.hot === 'true';
+
+    console.log('Discount Active:', discountActive);
+    console.log('Discount Active Type:', typeof discountActive);
+    console.log('Original Price:', createProductDto.price);
+    console.log('Original Price Type:', typeof createProductDto.price);
+
     // Calculate priceWithDiscount if a discount is applicable and discount is active
     let priceWithDiscount: number = createProductDto.price; // By default, set it to the original price
-
-    if (
-      createProductDto.discountPercentage > 0 &&
-      createProductDto.discountActive
-    ) {
+    if (createProductDto.discountPercentage > 0 && discountActive) {
       const discount = createProductDto.discountPercentage / 100;
       priceWithDiscount = +(createProductDto.price * (1 - discount)).toFixed(2);
     }
 
-    console.log(priceWithDiscount);
+    // Logging calculated priceWithDiscount
+    console.log('Price With Discount:', priceWithDiscount);
 
-    // Create and save the new product
+    // Save the image to the server
+    const imageUrl = await this.saveImage(imageFile);
+
+    // Create and save the new product with the assigned image URL
     const createdProduct = this.productRepository.create({
       ...createProductDto,
       category,
       priceWithDiscount,
+      discountActive,
+      sale,
+      new: newProduct,
+      inStock,
+      hot,
+      imageUrl, // Assign the image URL to the product
     });
+
+    // Logging the created product
+    console.log('Created Product:', createdProduct);
+
     return await this.productRepository.save(createdProduct);
   }
 
@@ -75,85 +124,152 @@ export class ProductService {
     return foundProduct;
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto) {
-    // Check if the product exists
-    const productExist = await this.productRepository.findOne({
+  async update(
+    id: number,
+    updateProductDto: UpdateProductDto,
+    imageFile?: Express.Multer.File,
+  ): Promise<Product> {
+    // Find the product to update
+    const existingProduct = await this.productRepository.findOne({
       where: { id },
     });
-    if (!productExist) {
+
+    if (!existingProduct) {
       throw new NotFoundException('Product not found');
     }
 
-    // Check if the product name already exists
-    if (updateProductDto.name) {
-      const productName = await this.productRepository.findOne({
-        where: { name: updateProductDto.name },
-      });
-      if (productName && productName.id !== id) {
-        throw new BadRequestException(
-          'Product with the same name already exists',
-        );
-      }
+    // Check if the provided category exists in the database
+    const category = await this.categoryService.findOneByName(
+      updateProductDto.category,
+    );
+    console.log(category);
+    if (!category) {
+      throw new BadRequestException('Category does not exist');
     }
 
-    // Convert category name to Category entity
-    let category: Category | undefined;
-    if (updateProductDto.category) {
-      category = await this.categoryService.findOneByName(
-        updateProductDto.category,
-      );
-      if (!category) {
-        throw new BadRequestException('Category does not exist');
-      }
+    // Logging discountPercentage, discountActive, and price before calculation
+    console.log('Discount Percentage:', updateProductDto.discountPercentage);
+    const discountActive =
+      typeof updateProductDto.discountActive === 'boolean'
+        ? updateProductDto.discountActive
+        : updateProductDto.discountActive === 'true';
+
+    const sale =
+      typeof updateProductDto.sale === 'boolean'
+        ? updateProductDto.sale
+        : updateProductDto.sale === 'true';
+
+    const newProduct =
+      typeof updateProductDto.new === 'boolean'
+        ? updateProductDto.new
+        : updateProductDto.new === 'true';
+
+    const inStock =
+      typeof updateProductDto.inStock === 'boolean'
+        ? updateProductDto.inStock
+        : updateProductDto.inStock === 'true';
+
+    const hot =
+      typeof updateProductDto.hot === 'boolean'
+        ? updateProductDto.hot
+        : updateProductDto.hot === 'true';
+
+    console.log('Discount Active:', discountActive);
+    console.log('Discount Active Type:', typeof discountActive);
+    console.log('Original Price:', updateProductDto.price);
+    console.log('Original Price Type:', typeof updateProductDto.price);
+
+    // Calculate priceWithDiscount if a discount is applicable and discount is active
+    let priceWithDiscount: number = updateProductDto.price; // By default, set it to the original price
+    if (updateProductDto.discountPercentage > 0 && discountActive) {
+      const discount = updateProductDto.discountPercentage / 100;
+      priceWithDiscount = +(updateProductDto.price * (1 - discount)).toFixed(2);
     }
 
-    // Validate price
-    if (
-      !Number.isFinite(updateProductDto.price) ||
-      updateProductDto.price <= 0
-    ) {
-      throw new BadRequestException('Price must be a valid positive number');
+    // Logging calculated priceWithDiscount
+    console.log('Price With Discount:', priceWithDiscount);
+
+    // Save the image to the server
+    const imageUrl = await this.saveImage(imageFile);
+
+    // Update product properties
+    existingProduct.name = updateProductDto.name;
+    existingProduct.description = updateProductDto.description;
+    existingProduct.category = category;
+    existingProduct.price = updateProductDto.price;
+    existingProduct.discountPercentage = updateProductDto.discountPercentage;
+    existingProduct.priceWithDiscount = priceWithDiscount;
+    existingProduct.discountActive = discountActive;
+    existingProduct.sale = sale;
+    existingProduct.new = newProduct;
+    existingProduct.inStock = inStock;
+    existingProduct.hot = hot;
+    if (imageUrl) {
+      existingProduct.imageUrl = imageUrl; // Assign the updated image URL to the product
     }
 
-    // Validate discountPercentage
-    if (
-      updateProductDto.discountPercentage &&
-      (updateProductDto.discountPercentage <= 0 ||
-        updateProductDto.discountPercentage >= 100)
-    ) {
-      throw new BadRequestException(
-        'Discount percentage must be a valid number between 0 and 100',
-      );
-    }
+    // Logging the updated product
+    console.log('Updated Product:', existingProduct);
 
-    // Calculate priceWithDiscount if both price and discountPercentage are provided
-    const { price, discountPercentage } = updateProductDto;
-    let priceWithDiscount = price;
-    if (discountPercentage) {
-      priceWithDiscount -= (price * discountPercentage) / 100;
-    }
-
-    // Create a partial entity object with the updated fields
-    const partialEntity: Partial<Product> = {
-      ...updateProductDto,
-      category: category ?? productExist.category, // Use the existing category if not provided in the DTO
-      priceWithDiscount: priceWithDiscount, // Update priceWithDiscount field
-    };
-
-    await this.productRepository.update(id, partialEntity);
-    return await this.productRepository.findOne({
-      where: { id },
-      relations: ['category'],
-    }); // Optionally, you can return the updated product
+    return await this.productRepository.save(existingProduct);
   }
 
   async remove(id: number) {
     const foundProduct = await this.productRepository.findOne({
       where: { id },
+      relations: ['orders'], // Assuming 'orders' is the relationship name between Product and OrderProduct
     });
+
     if (!foundProduct) {
       throw new NotFoundException('Product not found');
     }
+
+    // Delete associated records in the 'order_product' table
+    if (foundProduct.orders && foundProduct.orders.length > 0) {
+      for (const order of foundProduct.orders) {
+        await this.orderRepository.delete(order.id);
+      }
+    }
+
+    // Now delete the product itself
     return await this.productRepository.delete(id);
+  }
+
+  async saveImage(imageFile?: Express.Multer.File): Promise<string> {
+    try {
+      if (!imageFile) {
+        // If no image file is provided, return null or throw an error as per your requirement
+        return null; // or throw new Error('No image file provided');
+      }
+
+      let domain = 'localhost:3000'; // Default domain for development
+
+      // Check if the environment is production
+      if (process.env.NODE_ENV === 'production') {
+        // Set the production domain based on your actual production domain
+        domain = 'your-production-domain.com';
+      }
+
+      const uploadDir = join(process.cwd(), 'src', 'uploads');
+      const uploadPath = join(uploadDir, imageFile.originalname);
+
+      // Ensure that the uploads directory exists
+      if (!existsSync(uploadDir)) {
+        mkdirSync(uploadDir, { recursive: true });
+      }
+
+      const writeStream = createWriteStream(uploadPath);
+      await new Promise<void>((resolve, reject) => {
+        writeStream.write(imageFile.buffer);
+        writeStream.end(resolve); // Call end without any arguments
+        writeStream.on('error', reject);
+      });
+
+      // Return the absolute URL of the saved image
+      return `http://${domain}/${imageFile.originalname}`;
+    } catch (error) {
+      console.error('Error saving image:', error);
+      throw new Error('Failed to save image');
+    }
   }
 }

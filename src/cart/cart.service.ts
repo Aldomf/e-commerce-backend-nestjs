@@ -236,7 +236,7 @@ export class CartService {
         description: cartItem.product.description,
         price: price,
         quantity: cartItem.quantity,
-        image: cartItem.product.image,
+        imageUrl: cartItem.product.imageUrl,
       };
     });
 

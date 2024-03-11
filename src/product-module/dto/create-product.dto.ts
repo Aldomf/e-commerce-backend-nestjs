@@ -1,11 +1,12 @@
 import {
-  IsBoolean,
+  //IsBoolean,
   IsNotEmpty,
   IsNumber,
+  IsNumberString,
   IsOptional,
   IsString,
   Matches,
-  Min,
+  //Min,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -24,12 +25,12 @@ export class CreateProductDto {
   })
   readonly description: string;
 
-  @IsNumber()
+  @IsNumberString()
   @IsNotEmpty()
-  @Min(0, { message: 'Price must be greater than or equal to 0' })
+  //@Min(0, { message: 'Price must be greater than or equal to 0' })
   readonly price: number;
 
-  @IsBoolean()
+  //@IsBoolean()
   @IsOptional()
   readonly inStock?: boolean;
 
@@ -37,19 +38,19 @@ export class CreateProductDto {
   @IsNotEmpty()
   readonly category: string;
 
-  @IsBoolean()
+  //@IsBoolean()
   @IsOptional()
   readonly hot?: boolean;
 
-  @IsBoolean()
+  //@IsBoolean()
   @IsOptional()
   readonly sale?: boolean;
 
-  @IsBoolean()
+  //@IsBoolean()
   @IsOptional()
   readonly new?: boolean;
 
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
   readonly discountPercentage?: number;
 
@@ -57,14 +58,7 @@ export class CreateProductDto {
   @IsOptional()
   readonly priceWithDiscount?: number;
 
-  @IsBoolean()
+  //@IsBoolean()
   @IsOptional()
   readonly discountActive?: boolean;
-
-  @IsString()
-  @IsNotEmpty()
-  @Matches(/^https?:\/\/.+\.(png|jpg|jpeg|gif)$/, {
-    message: 'Image must be a valid URL ending with .png, .jpg, .jpeg, or .gif',
-  })
-  readonly image: string;
 }

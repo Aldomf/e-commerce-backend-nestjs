@@ -42,7 +42,7 @@ export class Product {
   new: boolean;
 
   @Column()
-  image: string;
+  imageUrl: string;
 
   @Column({ nullable: true }) // Nullable because not all products have discounts
   @IsNumber()
