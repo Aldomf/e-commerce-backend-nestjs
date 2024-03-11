@@ -17,13 +17,17 @@ import { Review } from './entities/review.entity';
 import { AuthGuard } from 'src/auth-module/guard/auth.guard';
 import { UserIdGuard } from 'src/common/guards/userId.guard';
 import { AdminGuard } from 'src/common/guards/admin.guard';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('reviews')
 @Controller('reviews')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
   @UseGuards(UserIdGuard)
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Endpoint reserved for specific user' })
   @Post(':userId/:productId')
   create(
     @Param('userId') userId: number,
@@ -35,6 +39,8 @@ export class ReviewController {
 
   @UseGuards(UserIdGuard)
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Endpoint reserved for specific user' })
   @Patch('/:userId/:id')
   async updateUserComment(
     @Param('userId', ParseIntPipe) userId: number,
@@ -46,6 +52,8 @@ export class ReviewController {
 
   @UseGuards(UserIdGuard)
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Endpoint reserved for specific user' })
   @Delete('/:userId/:id')
   async deleteUserComment(
     @Param('userId', ParseIntPipe) userId: number,
@@ -62,18 +70,24 @@ export class ReviewController {
   }
 
   @UseGuards(AdminGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin access required for this endpoint' })
   @Get()
   findAll(): Promise<Review[]> {
     return this.reviewService.findAll();
   }
 
   @UseGuards(AdminGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin access required for this endpoint' })
   @Get(':id')
   findOne(@Param('id') id: number): Promise<Review> {
     return this.reviewService.findOne(id);
   }
 
   @UseGuards(AdminGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin access required for this endpoint' })
   @Put(':id')
   update(
     @Param('id') id: number,
@@ -83,6 +97,8 @@ export class ReviewController {
   }
 
   @UseGuards(AdminGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin access required for this endpoint' })
   @Delete(':id')
   remove(@Param('id') id: number): Promise<void> {
     return this.reviewService.remove(id);

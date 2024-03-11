@@ -15,12 +15,16 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AdminGuard } from 'src/common/guards/admin.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('product')
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post('create')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin access required for this endpoint' })
   @UseGuards(AdminGuard)
   @UseInterceptors(FileInterceptor('image')) // Intercept the 'image' file from the request
   async create(
@@ -42,6 +46,8 @@ export class ProductController {
   }
 
   @Patch(':id')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin access required for this endpoint' })
   @UseGuards(AdminGuard)
   @UseInterceptors(FileInterceptor('image'))
   async update(
@@ -53,12 +59,17 @@ export class ProductController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin access required for this endpoint' })
   @UseGuards(AdminGuard)
   remove(@Param('id') id: string) {
     return this.productService.remove(+id);
   }
 
   @Post('upload-image')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin access required for this endpoint' })
+  @UseGuards(AdminGuard)
   @UseInterceptors(FileInterceptor('imageFile'))
   async uploadImage(@UploadedFile() imageFile: Express.Multer.File) {
     // Handle the uploaded image file and save it to the server

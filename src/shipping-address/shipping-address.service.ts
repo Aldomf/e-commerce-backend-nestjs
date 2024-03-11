@@ -92,4 +92,9 @@ export class ShippingAddressService {
 
     return shippingAddress;
   }
+
+  async findAll(): Promise<ShippingAddress[]> {
+    const shippingAddresses = await this.shippingAddressRepository.find();
+    return shippingAddresses;
+  }
 }

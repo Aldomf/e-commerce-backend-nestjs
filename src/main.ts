@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { config } from 'dotenv';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 config();
 
 async function bootstrap() {
@@ -16,6 +17,15 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  const config = new DocumentBuilder()
+    .setTitle('e-commerce documentation')
+    .setDescription('The e-commerce API description')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
 
   const port = process.env.PORT || 3000;
 

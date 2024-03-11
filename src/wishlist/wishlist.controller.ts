@@ -11,13 +11,17 @@ import {
 import { WishlistService } from './wishlist.service';
 import { AuthGuard } from 'src/auth-module/guard/auth.guard';
 import { UserIdGuard } from 'src/common/guards/userId.guard';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('wishlist')
+@ApiBearerAuth()
 @Controller('wishlist')
 @UseGuards(UserIdGuard)
 @UseGuards(AuthGuard)
 export class WishlistController {
   constructor(private readonly wishlistService: WishlistService) {}
 
+  @ApiOperation({ summary: 'Endpoint reserved for specific user' })
   @Post(':userId/add-product-to-wishlist/:productId')
   async addProductToWishlist(
     @Param('userId') userId: number,
@@ -34,6 +38,7 @@ export class WishlistController {
     }
   }
 
+  @ApiOperation({ summary: 'Endpoint reserved for specific user' })
   @Delete(':userId/delete-product-from-wishlist/:productId')
   async deleteProductFromWishlist(
     @Param('userId') userId: number,
@@ -50,6 +55,7 @@ export class WishlistController {
     }
   }
 
+  @ApiOperation({ summary: 'Endpoint reserved for specific user' })
   @Get('user/:userId')
   async findOneWishlist(@Param('userId') userId: string) {
     try {
