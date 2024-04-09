@@ -41,9 +41,12 @@ export class CategoryService {
       where: { id },
     });
     if (!categoryExist) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Category not found');
     }
-    return await this.categoryRepository.findOne({ where: { id } });
+    return await this.categoryRepository.findOne({
+      where: { id },
+      relations: ['products'],
+    });
   }
 
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
@@ -70,10 +73,18 @@ export class CategoryService {
     // Check if the product exists
     const categoryExist = await this.categoryRepository.findOne({
       where: { id },
+      relations: ['products'],
     });
     if (!categoryExist) {
       throw new NotFoundException('Product not found');
     }
+
+    if (categoryExist.products.length > 0) {
+      throw new BadRequestException(
+        'Cannot delete category with associated products',
+      );
+    }
+
     return await this.categoryRepository.delete(id);
   }
 

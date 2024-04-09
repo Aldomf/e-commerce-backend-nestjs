@@ -19,8 +19,8 @@ export class UserIdGuard implements CanActivate {
     const userIdFromToken = this.getUserIdFromToken(request);
     const userIdFromParams = request.params.userId;
 
-    console.log(userIdFromParams);
-    console.log(userIdFromToken);
+    console.log('Param id:', userIdFromParams);
+    console.log('Token id:', userIdFromToken);
 
     if (
       userIdFromToken &&

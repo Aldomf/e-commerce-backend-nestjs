@@ -26,6 +26,6 @@ export class Category {
   updatedAt: Date;
 
   // Define the one-to-many relationship with products
-  @OneToMany(() => Product, (product) => product.category)
+  @OneToMany(() => Product, (product) => product.category, { cascade: true })
   products: Product[];
 }

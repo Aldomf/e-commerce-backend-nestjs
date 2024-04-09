@@ -7,7 +7,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { CategoryService } from 'src/category/category.service';
 import { join } from 'path';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
@@ -138,6 +138,22 @@ export class ProductService {
       throw new NotFoundException('Product not found');
     }
 
+    // Check if the product with the same name already exists
+    const foundProduct = await this.productRepository.findOne({
+      where: {
+        name: updateProductDto.name,
+        // Exclude the current product by its ID
+        id: Not(id), // Assuming you're using TypeORM, you may need to import Not from typeorm
+      },
+    });
+
+    // If the found product has a different ID than the current product, it means there's another product with the same name
+    if (foundProduct && foundProduct.id !== id) {
+      throw new BadRequestException(
+        'Product with the same name already exists',
+      );
+    }
+
     // Check if the provided category exists in the database
     const category = await this.categoryService.findOneByName(
       updateProductDto.category,
@@ -242,7 +258,7 @@ export class ProductService {
         return null; // or throw new Error('No image file provided');
       }
 
-      let domain = 'localhost:3000'; // Default domain for development
+      let domain = 'localhost:4000'; // Default domain for development
 
       // Check if the environment is production
       if (process.env.NODE_ENV === 'production') {

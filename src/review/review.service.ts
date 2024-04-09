@@ -98,7 +98,7 @@ export class ReviewService {
     // Find the product
     const product = await this.productRepository.findOne({
       where: { id: productId },
-      relations: ['reviews'],
+      relations: ['reviews', 'reviews.user'],
     });
     if (!product) {
       throw new NotFoundException(`Product with ID ${productId} not found`);

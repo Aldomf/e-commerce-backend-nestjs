@@ -40,11 +40,12 @@ export class OrderController {
     return this.orderService.findAll();
   }
 
-  @Get(':id')
-  @UseGuards(AdminGuard)
-  @ApiOperation({ summary: 'Admin access required for this endpoint' })
-  findOne(@Param('id') id: string) {
-    return this.orderService.findOne(+id);
+  @Get(':userId/:id')
+  //@UseGuards(AdminGuard)
+  @UseGuards(UserIdGuard)
+  @ApiOperation({ summary: 'Endpoint reserved for specific user' })
+  findOne(@Param('userId') userId: string, @Param('id') id: string) {
+    return this.orderService.findOne(+userId, +id);
   }
 
   @Patch(':id')
@@ -54,14 +55,15 @@ export class OrderController {
     return this.orderService.update(+id, updateOrderDto);
   }
 
-  @Patch(':id/status')
+  @Patch(':userId/:id/status')
   @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Admin access required for this endpoint' })
   async updateOrderStatus(
+    @Param('userId') userId: string,
     @Param('id') id: string,
     @Body('status') status: Status,
   ): Promise<Order> {
-    return this.orderService.updateOrderStatus(+id, status);
+    return this.orderService.updateOrderStatus(+userId, +id, status);
   }
 
   @Delete(':id')
@@ -71,7 +73,7 @@ export class OrderController {
     return this.orderService.remove(+id);
   }
 
-  @Get('user/:userId')
+  @Get(':userId')
   @UseGuards(UserIdGuard)
   @ApiOperation({ summary: 'Endpoint reserved for specific user' })
   async findOrdersByUserId(@Param('userId') userId: string) {

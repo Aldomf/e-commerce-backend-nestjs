@@ -1,4 +1,6 @@
 import {
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   Entity,
   JoinColumn,
@@ -31,4 +33,13 @@ export class CartListItem {
 
   @Column()
   productId: number;
+
+  // Add validation to ensure quantity cannot be less than 1
+  @BeforeUpdate()
+  @BeforeInsert()
+  validateQuantity() {
+    if (this.quantity < 1) {
+      throw new Error('Quantity cannot be less than 1');
+    }
+  }
 }

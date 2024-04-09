@@ -28,10 +28,10 @@ export class OrderService {
     return this.orderRepository.find({ relations: ['products'] });
   }
 
-  async findOne(id: number): Promise<Order | undefined> {
+  async findOne(userId: number, id: number): Promise<Order | undefined> {
     return this.orderRepository.findOne({
       where: { id },
-      relations: ['products'],
+      relations: ['products', 'user', 'user.shippingAddress'],
     });
   }
 
@@ -43,8 +43,12 @@ export class OrderService {
     await this.orderRepository.softDelete(id);
   }
 
-  async updateOrderStatus(id: number, status: Status): Promise<Order> {
-    const order = await this.findOne(id);
+  async updateOrderStatus(
+    userId: number,
+    id: number,
+    status: Status,
+  ): Promise<Order> {
+    const order = await this.findOne(userId, id);
     if (!order) {
       throw new Error('Order not found');
     }

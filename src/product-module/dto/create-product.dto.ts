@@ -1,7 +1,6 @@
 import {
   //IsBoolean,
   IsNotEmpty,
-  IsNumber,
   IsNumberString,
   IsOptional,
   IsString,
@@ -54,9 +53,9 @@ export class CreateProductDto {
   @IsOptional()
   readonly discountPercentage?: number;
 
-  @IsNumber()
+  @IsString()
   @IsOptional()
-  readonly priceWithDiscount?: number;
+  readonly imageUrl?: string;
 
   //@IsBoolean()
   @IsOptional()
