@@ -46,14 +46,19 @@ export class OrderService {
   async updateOrderStatus(
     userId: number,
     id: number,
-    status: Status,
-  ): Promise<Order> {
-    const order = await this.findOne(userId, id);
-    if (!order) {
-      throw new Error('Order not found');
+  ): Promise<Order | { error: string }> {
+    // Adjust the return type to include error message
+    try {
+      const order = await this.findOne(userId, id);
+      if (!order) {
+        throw new Error('Order not found');
+      }
+      order.orderStatus = Status.Shipped;
+      return this.orderRepository.save(order);
+    } catch (error) {
+      console.error('Error updating order status:', error.message);
+      return { error: error.message }; // Return error message in response
     }
-    order.orderStatus = status;
-    return this.orderRepository.save(order);
   }
 
   async findOrdersByUserId(userId: number): Promise<Order[]> {

@@ -9,11 +9,13 @@ import {
   NotFoundException,
   BadRequestException,
   UseGuards,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { Status } from 'src/common/enums/status.enum';
+//import { Status } from 'src/common/enums/status.enum';
 import { Order } from './entities/order.entity';
 import { AuthGuard } from 'src/auth-module/guard/auth.guard';
 import { AdminGuard } from 'src/common/guards/admin.guard';
@@ -56,14 +58,17 @@ export class OrderController {
   }
 
   @Patch(':userId/:id/status')
-  @UseGuards(AdminGuard)
-  @ApiOperation({ summary: 'Admin access required for this endpoint' })
   async updateOrderStatus(
     @Param('userId') userId: string,
     @Param('id') id: string,
-    @Body('status') status: Status,
   ): Promise<Order> {
-    return this.orderService.updateOrderStatus(+userId, +id, status);
+    const result = await this.orderService.updateOrderStatus(+userId, +id);
+    if ('error' in result) {
+      // If error object is returned, throw an HttpException with the error message
+      throw new HttpException(result.error, HttpStatus.BAD_REQUEST);
+    }
+    // If an Order object is returned, return it
+    return result;
   }
 
   @Delete(':id')
