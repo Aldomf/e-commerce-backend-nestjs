@@ -53,7 +53,7 @@ export class OrderService {
       if (!order) {
         throw new Error('Order not found');
       }
-      order.orderStatus = Status.Shipped;
+      order.orderStatus = Status.Delivered;
       return this.orderRepository.save(order);
     } catch (error) {
       console.error('Error updating order status:', error.message);

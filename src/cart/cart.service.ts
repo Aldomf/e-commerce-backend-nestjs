@@ -243,6 +243,37 @@ export class CartService {
     return items;
   }
 
+  async getCartItem(userId: number, productId: number) {
+    // Fetch the specific item from the user's cart
+    const cartItem = await this.cartListItemRepository.findOne({
+      where: { userId, productId },
+      relations: ['product'],
+    });
+
+    // Check if the item exists
+    if (!cartItem) {
+      throw new NotFoundException(
+        `Item with productId ${productId} not found in user's cart`,
+      );
+    }
+
+    // Construct the item object with product details and quantity
+    const price =
+      cartItem.product.discountActive && cartItem.product.priceWithDiscount
+        ? cartItem.product.priceWithDiscount
+        : cartItem.product.price;
+
+    const item = {
+      name: cartItem.product.name,
+      description: cartItem.product.description,
+      price,
+      quantity: cartItem.quantity,
+      imageUrl: cartItem.product.imageUrl,
+    };
+
+    return item;
+  }
+
   async getCartItems(userId: number): Promise<CartListItem[]> {
     return await this.cartListItemRepository.find({ where: { userId } });
   }

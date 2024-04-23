@@ -79,6 +79,18 @@ export class CartController {
   }
 
   @UseGuards(CartGuard)
+  @ApiOperation({
+    summary: "Endpoint to retrieve a specific product from a user's cart",
+  })
+  @Get(':userId/items/:productId')
+  async getUserCartItem(
+    @Param('userId') userId: number,
+    @Param('productId') productId: number,
+  ) {
+    return this.cartService.getCartItem(userId, productId);
+  }
+
+  @UseGuards(CartGuard)
   @ApiOperation({ summary: 'Endpoint reserved for specific user' })
   @Get('user/:userId')
   async findCartByUserId(@Param('userId') userId: string) {
